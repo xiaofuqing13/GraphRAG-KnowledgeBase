@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# 环境
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# GraphRAG
+ragtest/cache/
+ragtest/output/
+ragtest/outputlancedb/
+ragtest/logs/
+ragtest/.env
+
+# Node
+node_modules/
+
+# 日志
+*.log
+logs/

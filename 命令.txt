@@ -1,0 +1,5 @@
+python -m graphrag index --root ./ragtest
+
+python -m graphrag query --root ./ragtest --method global --query "智创云联科技 财务报表" --streaming 
+
+local
