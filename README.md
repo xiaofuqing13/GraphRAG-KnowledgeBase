@@ -1,5 +1,8 @@
 # GraphRAG 知识库检索系统
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?style=flat-square&logo=github)
+
+
 > 基于微软 GraphRAG 的知识图谱增强检索系统 · LanceDB 向量数据库 · 局部/全局双模式搜索
 
 ## 项目目的
@@ -104,4 +107,4 @@ GraphRAG-KnowledgeBase/
 
 ## 开源协议
 
-MIT License
+MIT 许可证
