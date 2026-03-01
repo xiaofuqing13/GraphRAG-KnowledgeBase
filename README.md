@@ -1,85 +1,106 @@
-# GraphRAG-KnowledgeBase — 基于 GraphRAG 的知识库检索系统
+# GraphRAG 知识库检索系统
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://python.org/)
-[![GraphRAG](https://img.shields.io/badge/GraphRAG-Microsoft-0078D4?logo=microsoft)](https://github.com/microsoft/graphrag)
-[![LanceDB](https://img.shields.io/badge/LanceDB-向量检索-FF6B35)](https://lancedb.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+> 基于微软 GraphRAG 的知识图谱增强检索系统 · LanceDB 向量数据库 · 局部/全局双模式搜索
 
-## 项目背景
+## 项目目的
 
-传统的文档检索方式（如关键词搜索）在面对大量非结构化文档时，很难理解文档间的关联关系和上下文语义。用户提出一个复杂问题，往往需要翻阅多份文档才能拼凑出答案，效率很低。
+传统 RAG（检索增强生成）基于向量相似度匹配文本片段，无法理解实体间的深层关联。本项目基于 微软 GraphRAG 框架，通过构建知识图谱提取实体和关系，利用社区检测算法组织信息结构，实现跨文档的语义理解和推理，显著提升复杂问题的回答质量。
 
-本项目基于微软的 [GraphRAG](https://github.com/microsoft/graphrag) 框架，构建了一个知识图谱驱动的 RAG（检索增强生成）系统。系统先对文档进行实体抽取和关系建模，生成知识图谱，再结合大语言模型进行问答。相比普通 RAG，知识图谱能捕获文档间的深层关联，回答更准确、更完整。
+## 解决的痛点
 
-## 效果展示
+- 传统 RAG 仅做浅层文本匹配，无法回答需要跨文档推理的问题
+- 知识图谱构建和维护成本高
+- 向量检索缺少对实体关系的建模
+- 大规模文档库中信息碎片化，缺乏全局视角
 
-### 搜索界面
-![搜索界面](docs/search-ui.png)
+## 系统效果展示
 
-支持 Local Search（局部上下文检索）和 Global Search（全局摘要检索）两种模式。
+### 搜索查询界面
+
+支持自然语言输入，同时展示局部搜索和全局搜索结果。
+
+![搜索界面](docs/search_interface.png)
+
+### 索引构建过程
+
+终端展示文档加载、实体提取、关系构建、社区检测的完整索引流程。
+
+![索引过程](docs/indexing_process.png)
 
 ### 检索结果对比
-![检索结果对比](docs/search-results.png)
 
-Local Search 返回基于具体文档片段的精确答案，Global Search 返回基于全局社区摘要的综合分析。
+局部搜索与全局搜索的不同检索策略对比展示。
+
+![检索结果](docs/search_results.png)
+
+### 知识图谱社区结构
+
+GraphRAG 自动发现的实体社区可视化，不同颜色表示不同主题聚类。
+
+![社区结构](docs/community_graph.png)
 
 ### 知识图谱浏览器
-![知识图谱浏览器](docs/graph-explorer.png)
 
-Graph Explorer 可视化展示文档中抽取的实体和社区关系，支持按层级筛选和查看详细报告。
+交互式知识图谱可视化，展示实体节点和关系边。
 
-## 核心功能
+![知识图谱](docs/graph_explorer.png)
 
-| 功能 | 说明 |
-|------|------|
-| 知识图谱构建 | 自动从文档中抽取实体和关系，构建索引 |
-| 双模式检索 | Global（全局摘要）和 Local（局部上下文）检索 |
-| 流式输出 | 结合大语言模型的流式回答，实时返回结果 |
-| LanceDB 存储 | 向量数据库存储嵌入，高效相似度检索 |
-| Web 搜索前端 | 基于 Docker 部署的统一搜索应用 |
+## 技术架构
+
+| 模块 | 技术方案 |
+|------|---------|
+| 图谱构建 | Microsoft GraphRAG + LLM 实体提取 |
+| 向量存储 | LanceDB 本地向量数据库 |
+| 社区检测 | Leiden 算法层次化聚类 |
+| 嵌入模型 | text-embedding-3-small |
+| LLM 推理 | GPT-4o / GPT-4o-mini |
+| 前端检索 | Streamlit / Vue.js |
+
+## 搜索模式
+
+### 局部搜索（Local Search）
+- 从查询实体出发，沿知识图谱边遍历
+- 适合有明确实体的精确查询
+- 返回与查询实体直接相关的上下文
+
+### 全局搜索（Global Search）
+- 基于社区检测的层次化摘要
+- 适合需要全局概览的开放性问题
+- 融合多个社区的信息形成综合回答
+
+## 快速开始
+
+```bash
+git clone https://github.com/xiaofuqing13/GraphRAG-KnowledgeBase.git
+cd GraphRAG-KnowledgeBase
+
+pip install graphrag lancedb
+
+# 初始化项目
+python -m graphrag init --root ./ragtest
+
+# 构建索引
+python -m graphrag index --root ./ragtest
+
+# 局部搜索
+python -m graphrag query --root ./ragtest --method local --query "查询内容"
+
+# 全局搜索
+python -m graphrag query --root ./ragtest --method global --query "查询内容"
+```
 
 ## 项目结构
 
 ```
 GraphRAG-KnowledgeBase/
-├── graphrag/                   # GraphRAG 核心框架
-├── ragtest/                    # 知识库实例配置
-│   ├── input/                  # 输入文档
-│   ├── output/                 # 索引输出（知识图谱）
-│   ├── prompts/                # 自定义提示词
-│   └── settings.yaml           # 配置文件
-├── unified-search-app/         # 搜索前端
-├── docs/                       # 文档
-├── examples_notebooks/         # 使用示例
-└── pyproject.toml              # 依赖配置
+├── ragtest/             # GraphRAG 工作目录
+│   ├── input/           # 输入文档
+│   ├── output/          # 索引输出
+│   └── settings.yaml    # 配置文件
+├── frontend/            # 搜索前端
+├── scripts/             # 工具脚本
+└── docs/                # 文档截图
 ```
-
-## 快速开始
-
-```bash
-# 安装依赖
-pip install poetry
-poetry install
-
-# 构建知识图谱索引
-python -m graphrag index --root ./ragtest
-
-# 全局检索
-python -m graphrag query --root ./ragtest --method global --query "你的问题" --streaming
-
-# 局部检索
-python -m graphrag query --root ./ragtest --method local --query "你的问题"
-```
-
-## 配置说明
-
-编辑 `ragtest/settings.yaml`：
-- LLM 模型接口地址和 API Key
-- 嵌入模型配置
-- 文档分块策略
-- 索引存储路径
-
-> 本项目基于 [Microsoft GraphRAG](https://github.com/microsoft/graphrag) 框架二次开发。
 
 ## 开源协议
 
